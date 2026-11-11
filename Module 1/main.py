@@ -59,14 +59,14 @@ async def generate_explanation(request: TextRequest):
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
-    #Academic Image Analysis and Explanation 
-    @app.post("/analyze-image")
-    async def analyze_image(File: UploadFile = File(...)):
+#Academic Image Analysis and Explanation 
+@app.post("/analyze-image")
+async def analyze_image(File: UploadFile = File(...)):
         if file.content_type not in ["image/jpeg", "image/png"]:
             return JSONResponse(status_code=400, content={"error": "Invalid file type. Only JPEG and PNG files are allowed."})
 
         try:
-            image_bytes = await file.read()
+            image_bytes = file.read()
             image_input = types.Part.from_bytes(image_bytes, mime_type=file.content_type)
 
             prompt = f"""
@@ -80,7 +80,7 @@ async def generate_explanation(request: TextRequest):
             3. "related_concepts": list of strings (concepts related to the image and question)
             """
 
-            response = await ai_client.models.generate_content(
+            response = ai_client.models.generate_content(
                 model=model,
                 contents=[prompt, image_input],
                 config=types.GenerateContentConfig(
@@ -95,14 +95,14 @@ async def generate_explanation(request: TextRequest):
         except Exception as e:
             return JSONResponse(status_code=500, content={"error": str(e)})
 
-    # Text Question and Audio Answer Evaluation
-    @app.post("/evaluate-audio-answer")
-    async def evaluate_audio_answer(file: UploadFile = File(...), question: str = Form(...)):
+# Text Question and Audio Answer Evaluation
+@app.post("/evaluate-audio-answer")
+async def evaluate_audio_answer(file: UploadFile = File(...), question: str = Form(...)):
         if file.content_type not in ["audio/mpeg", "audio/wav"]:
             return JSONResponse(status_code=400, content={"error": "Invalid file type. Only MP3 and WAV files are allowed."})
 
         try:
-            audio_bytes = await file.read()
+            audio_bytes = file.read()
             audio_input = types.Part.from_bytes(audio_bytes, mime_type=file.content_type)
 
             prompt = f"""
@@ -116,7 +116,7 @@ async def generate_explanation(request: TextRequest):
             3. "feedback": string (constructive feedback for improvement)
             """
 
-            response = await ai_client.models.generate_content(
+            response = ai_client.models.generate_content(
                 model=model,
                 contents=[prompt, audio_input],
                 config=types.GenerateContentConfig(
@@ -133,13 +133,13 @@ async def generate_explanation(request: TextRequest):
 
 
 # Video Analysis and Generate 3 MCQ Questi with options and answers
-    @app.post("/analyze-video")
-    async def analyze_video(file: UploadFile = File(...), question: str = Form(...)):
+@app.post("/analyze-video")
+async def analyze_video(file: UploadFile = File(...), question: str = Form(...)):
         if file.content_type not in ["video/mp4", "video/avi"]:
             return JSONResponse(status_code=400, content={"error": "Invalid file type. Only MP4 and AVI files are allowed."})
 
         try:
-            video_bytes = await file.read()
+            video_bytes = file.read()
             video_input = types.Part.from_bytes(video_bytes, mime_type=file.content_type)
 
             prompt = f"""
@@ -153,7 +153,7 @@ async def generate_explanation(request: TextRequest):
             2. "mcq_questions": list of objects with "question", "options" (list of strings), and "correct_answer" (string)
             """
 
-            response = await ai_client.models.generate_content(
+            response = ai_client.models.generate_content(
                 model=model,
                 contents=[prompt, video_input],
                 config=types.GenerateContentConfig(
